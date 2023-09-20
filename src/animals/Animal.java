@@ -1,7 +1,6 @@
 package animals;
 
 import core.Directions;
-import core.Field;
 import core.RandomUtil;
 
 
@@ -134,7 +133,6 @@ public abstract class Animal implements Organizm {
     }
 
 
-
     @Override
     public void die() {
         this.satiety = 0;
@@ -142,10 +140,14 @@ public abstract class Animal implements Organizm {
         this.weight = 0;
 
     }
+    public boolean isOutOfBounds(int maxX, int maxY){
+        return this.x<0 || this.x>=maxX || this.y< 0 || this.y>=maxY;
+    }
+
 
     public void move() {
 
-        int randomDirIndex = RandomUtil.getNumber(0, Directions.values().length - 1);
+        int randomDirIndex = RandomUtil.getNumber(0, Directions.values().length - 1);//FIXME!!!
         Directions direction = Directions.values()[randomDirIndex];
 
         int offsetX = 0;
@@ -168,15 +170,10 @@ public abstract class Animal implements Organizm {
         }
 
         // Вычисляем новые координаты
-        int newX = x + offsetX;
-        int newY = y + offsetY;
+        this.x += offsetX;
+        this.y += offsetY;
 
 
-        // Проверяем, что новые координаты находятся в пределах поля
-        if (newX >= 0 && newX < Field.colls && newY >= 0 && newY < Field.rows) {
-            x = newX;
-            y = newY;
-        }
         this.NotMoved = false;
         this.satiety--;
 
