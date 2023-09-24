@@ -20,6 +20,7 @@ public abstract class Animal implements Organizm {
         this.maxSatiety = maxSatiety;
     }
 
+    @Override
     public boolean isCanBreed() {
         return canBreed;
     }
@@ -133,13 +134,6 @@ public abstract class Animal implements Organizm {
     }
 
 
-    @Override
-    public void die() {
-        this.satiety = 0;
-        this.maxSatiety = 0;
-        this.weight = 0;
-
-    }
     public boolean isOutOfBounds(int maxX, int maxY){
         return this.x<0 || this.x>=maxX || this.y< 0 || this.y>=maxY;
     }
@@ -155,18 +149,14 @@ public abstract class Animal implements Organizm {
         int rndMove = RandomUtil.getNumber(1, this.maxMoveDistance);
 
         switch (direction) {
-            case UP: // Движение вверх
-                offsetY = -rndMove;
-                break;
-            case DOWN: // Движение вниз
-                offsetY = rndMove;
-                break;
-            case LEFT: // Движение влево
-                offsetX = -rndMove;
-                break;
-            case RIGHT: // Движение вправо
-                offsetX = rndMove;
-                break;
+            case UP -> // Движение вверх
+                    offsetY = -rndMove;
+            case DOWN -> // Движение вниз
+                    offsetY = rndMove;
+            case LEFT -> // Движение влево
+                    offsetX = -rndMove;
+            case RIGHT -> // Движение вправо
+                    offsetX = rndMove;
         }
 
         // Вычисляем новые координаты
@@ -175,7 +165,7 @@ public abstract class Animal implements Organizm {
 
 
         this.NotMoved = false;
-        this.satiety--;
+        this.decreaseHealth(1);
 
 
     }

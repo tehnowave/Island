@@ -16,7 +16,6 @@ public abstract class Predator extends Animal {
     }
 
 
-
     @Override
     public boolean eat(Organizm organizm) {
         if (organizm instanceof Herbivorous) {
@@ -25,7 +24,7 @@ public abstract class Predator extends Animal {
 
             if (randomValue < probability) {
 
-          //      System.out.println(this.getClass().getSimpleName() + " successfully ate the " + organizm.getClass().getSimpleName() + ".");
+
                 if (this.getSatiety() < this.getMaxSatiety()) {
                     increaseSatiety(1);
                 }
@@ -33,7 +32,7 @@ public abstract class Predator extends Animal {
 
             } else {
 
-            //    System.out.println(this.getClass().getSimpleName() + " failed to eat the " + organizm.getClass().getSimpleName() + ".");
+
                 return false;
             }
         }
@@ -41,11 +40,6 @@ public abstract class Predator extends Animal {
 
     }
 
-
-    @Override
-    public void die() {
-
-    }
 
     protected abstract Animal createChild(Animal partner);
 }

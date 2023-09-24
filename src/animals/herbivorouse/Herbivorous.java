@@ -11,12 +11,6 @@ public abstract class Herbivorous extends Animal implements Organizm {
 
 
 
-
-    @Override
-    public void die() {
-
-    }
-
     @Override
     public boolean eat(Organizm organizm) {
         if (organizm instanceof Plant) {

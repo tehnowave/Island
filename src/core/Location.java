@@ -4,16 +4,20 @@ import animals.Animal;
 import animals.Organizm;
 import plant.Plant;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
-public class Location extends Thread {
+public class Location {
     private int x;
     private int y;
+    // List to store all organisms in this location
     private ArrayList<Organizm> organizms;
+
+    // Reference to the parent field this location is part of
     private Field parentField;
 
+    // Constructor for the location specifying its coordinates and the field it belongs to
     public Location(int x, int y, Field field) {
 
         this.x = x;
@@ -22,42 +26,42 @@ public class Location extends Thread {
         this.parentField = field;
     }
 
-    public synchronized void addOrganizm(Organizm organizm) {
+    // Add an organism to this location
+    protected void addOrganizm(Organizm organizm) {
         if (organizm != null) {
             organizms.add(organizm);
-            //    Collections.shuffle(organizms);
-        } else {
-            //    System.out.println("Warning: Tried to add a null Organizm.");
         }
     }
 
-    public void shuffleAnimals(){
+    // Get all organisms from this location
+    protected ArrayList<Organizm> getOrganizms() {
+        return organizms;
+    }
+
+    protected void shuffleAnimals() {
         Collections.shuffle(organizms);
     }
 
-    public int[] getStat(){
-
-    }
-
-
-
-    public synchronized void removeAnimal(Organizm organizm) {
+    //  Remove an organism from this location
+    protected void removeAnimal(Organizm organizm) {
         this.organizms.remove(organizm);
     }
 
-    public void generateGrass() {
+    // Generate random amount of grass in this location
+    protected void generateGrass() {
         for (int k = 0; k < RandomUtil.randomInt(200) + 1; k++) {
             this.addOrganizm(new Plant());
         }
     }
 
+    // Check if there are too many of a specific organism in this location
     private boolean checkAmount(Animal organizm) {
         AnimalTypes type = AnimalTypes.valueOf(organizm.getClass().getSimpleName().toUpperCase());  // Преобразование в enum
         return this.countOrgranizm(organizm) > type.getAmount();
     }
 
-
-    private void resetFlag() {
+    // Reset the move flags of animals in this location after every simulation step
+    protected void resetFlag() {
 
 
         for (Organizm organizm : organizms) {
@@ -65,10 +69,10 @@ public class Location extends Thread {
                 ((Animal) organizm).resetMovedFlag();
             }
         }
-
     }
 
-    public void moveAnimals() {
+    // Move animals from one location to another
+    protected void moveAnimals() {
 
         for (int i = organizms.size() - 1; i >= 0; i--) {
             Organizm organizm = organizms.get(i);
@@ -85,10 +89,10 @@ public class Location extends Thread {
 
                     currentAnimal.move();
 
-                    if (!currentAnimal.isOutOfBounds(parentField.getColls(), parentField.getRows()) && checkAmount(currentAnimal)) {
+                    if (!currentAnimal.isOutOfBounds(parentField.getCols(), parentField.getRows()) && checkAmount(currentAnimal)) {
                         parentField.getLocation(currentAnimal.getY(), currentAnimal.getX()).addOrganizm(currentAnimal);
-                        this.removeAnimal(currentAnimal);//FIXME Sync this action
-                        //         System.out.println(currentAnimal + " from : " + oldY + "," + oldX + " moved to : " + currentAnimal.getY() + "," + currentAnimal.getX() + ".");
+                        this.removeAnimal(currentAnimal);
+
                     } else {
                         currentAnimal.setY(oldY);
                         currentAnimal.setX(oldX);
@@ -98,33 +102,48 @@ public class Location extends Thread {
         }
     }
 
-    public void lookingForCouple() {
-        for (int i = 0; i < organizms.size(); i++) {
-            for (int j = i + 1; j < organizms.size(); j++) {
-                Organizm currentOrganizm = organizms.get(i);
+    // Organisms in the location look for a partner to reproduce with
+    protected void lookingForCouple() {
+
+        HashMap<Class<?>, List<Organizm>> map = new HashMap<>();
+        for (Organizm org : organizms) {
+            map.computeIfAbsent(org.getClass(), k -> new ArrayList<>()).add(org);
+        }
+
+
+        for (List<Organizm> sameTypeOrganisms : map.values()) {
+            for (int i = 0; i < sameTypeOrganisms.size(); i++) {
+                Organizm currentOrganizm = sameTypeOrganisms.get(i);
+                if (!currentOrganizm.isCanBreed()) continue;
 
                 AnimalTypes type = AnimalTypes.valueOf(currentOrganizm.getClass().getSimpleName().toUpperCase());
 
-                if (countOrgranizm(currentOrganizm) > type.getAmount()) {
+                if (sameTypeOrganisms.size() > type.getAmount()) {
                     return;
                 }
-                Organizm child = currentOrganizm.breed(organizms.get(j));
-                if (child != null) {
 
-                    addOrganizm(child);
-                    //  System.out.println("New organism: of "+  child.getClass());
-                    break;
+                for (int j = i + 1; j < sameTypeOrganisms.size(); j++) {
+                    Organizm partner = sameTypeOrganisms.get(j);
+                    if (!partner.isCanBreed()) continue;
+
+                    Organizm child = currentOrganizm.breed(partner);
+                    if (child != null) {
+                        addOrganizm(child);
+                        break;
+                    }
                 }
             }
         }
 
         for (Organizm organism : organizms) {
-
             organism.resetBreed();
         }
     }
 
-    public int countOrgranizm(Organizm organizm) {
+
+
+    // Count how many of a specific organism type are in this location
+    protected int countOrgranizm(Organizm organizm) {
         int currentCount = 0;
         for (Organizm org : organizms) {
 
@@ -135,8 +154,8 @@ public class Location extends Thread {
         return currentCount;
     }
 
-
-    public void simulateHunt() {
+    // Simulate the hunting behavior where predators hunt for prey
+    protected void simulateHunt() {
         for (int i = 0; i < organizms.size(); i++) {
             Organizm organizm = organizms.get(i);
 
@@ -144,7 +163,6 @@ public class Location extends Thread {
                 for (int j = 0; j < organizms.size(); j++) {
                     Organizm possibleOrganizm = organizms.get(j);
                     if (organizm.eat(possibleOrganizm)) {
-                        possibleOrganizm.die();
                         this.removeAnimal(possibleOrganizm);
                         break;
                     }
@@ -152,5 +170,4 @@ public class Location extends Thread {
             }
         }
     }
-
 }

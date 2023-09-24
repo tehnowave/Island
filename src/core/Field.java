@@ -6,63 +6,51 @@ import animals.herbivorouse.*;
 import animals.predator.*;
 import plant.Plant;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 
 public class Field {
+    // Dimensions of the field
     private int rows;
-    private int colls;
+    private int cols;
+    // 2D array representing each location in the field
     private Location[][] locations;
 
-    private ExecutorService executorService;
-
-
-    public Field(int rows, int colls, int amountOfThreads) {
+    // Constructor to initialize field with given dimensions
+    public Field(int rows, int cols) {
         this.rows = rows;
-        this.colls = colls;
-        this.locations = new Location[rows][colls];
+        this.cols = cols;
+        this.locations = new Location[rows][cols];
 
+        // Initialization steps
         initialize();
         generateGrass();
         generateAnimals();
         shuffle();
 
-        executorService = Executors.newFixedThreadPool(amountOfThreads);
-
 
     }
 
-    public Location getLocation(int y, int x) {
-        return locations[y][x];
-    }
-
-
+    // Initialize each location in the 2D array
     private void initialize() {
         for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < colls; j++) {
+            for (int j = 0; j < cols; j++) {
                 this.locations[i][j] = new Location(i, j, this);
             }
         }
     }
-
+    // Generate grass in each location of the field
     private void generateGrass() {
         for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < colls; j++) {
+            for (int j = 0; j < cols; j++) {
                 locations[i][j].generateGrass();
             }
         }
     }
 
+    // Add specific type of animal to the field
     private void addAnimal(AnimalTypes animalTypes) {
-
         for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < colls; j++) {
-
-
+            for (int j = 0; j < cols; j++) {
                 int amount = RandomUtil.randomInt(animalTypes.getAmount()) + 1;
-
-
                 for (int k = 0; k < amount; k++) {
                     Animal currentAnimal = null;
                     switch (animalTypes) {
@@ -85,13 +73,11 @@ public class Field {
                     }
                     locations[i][j].addOrganizm(currentAnimal);
                 }
-
             }
         }
-
     }
 
-
+    // Generate animals and populate them in the field
     public void generateAnimals() {
         AnimalTypes[] animalTypes = AnimalTypes.values();
         for (AnimalTypes currentType : animalTypes) {
@@ -99,152 +85,136 @@ public class Field {
         }
     }
 
-
+    // Simulate reproduction for the animals
     private void reproduceSimulation() {
         for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < colls; j++) {
+            for (int j = 0; j < cols; j++) {
                 locations[i][j].lookingForCouple();
-
-
             }
         }
     }
 
-
+    // Shuffle the order of animals in each location
     private void shuffle() {
         for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < colls; j++) {
+            for (int j = 0; j < cols; j++) {
                 locations[i][j].shuffleAnimals();
             }
         }
     }
-
-
+    // Simulate the entire ecosystem
     public void symulate() {
-
         while (endOfSimulation()) {
-
-
             for (int i = 0; i < rows; i++) {
-                for (int j = 0; j < colls; j++) {
-                    final Location currentLocation = locations[i][j];
-                    printStatistic();
+                for (int j = 0; j < cols; j++) {
+                    Location currentLocation = locations[i][j];
+                    try {
+                        printStatistic();
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
                     currentLocation.simulateHunt();
-
-                    //moveAnimals(currentLocation);
-                    //    reproduceSimulation();
+                    currentLocation.moveAnimals();
+                   reproduceSimulation();
 
                 }
             }
-
-
-            //  resetFlag();
-
+            runResetFlag();
         }
-
-//        scheduler.shutdown();
-//        scheduler.shutdownNow();
+    }
+    // Reset flags after each simulation step
+    private void runResetFlag() {
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                Location currentLocation = locations[i][j];
+                currentLocation.resetFlag();
+            }
+        }
     }
 
-
-//    private boolean endOfSimulation() {
-//        int countOfPredators = 0;
-//        int countOfHebivorouses = 0;
-//        int countOfPlants = 0;
-//
-//        for (int i = 0; i < rows; i++) {
-//            for (int j = 0; j < colls; j++) {
-//
-//                for (Organizm currentOrganizm : locations[i][j].getOrganizms()) {
-//                    if (currentOrganizm instanceof Predator) {
-//                        countOfPredators++;
-//
-//                    } else if (currentOrganizm instanceof Herbivorous) {
-//                        countOfHebivorouses++;
-//
-//                    } else if (currentOrganizm instanceof Plant) {
-//                        countOfPlants++;
-//
-//                    }
-//                }
-//
-//            }
-//
-//        }
-//        if (countOfPredators == 0 && countOfHebivorouses == 0 && countOfPlants == 0) {
-//            System.out.println("All died");
-//            return false;
-//        } else if (countOfPredators > 0 && countOfHebivorouses == 0 && countOfPlants == 0) {
-//            System.out.println(countOfPredators + " Predators stay alive");
-//            return false;
-//        } else if (countOfPredators == 0 && countOfHebivorouses > 0 && countOfPlants == 0) {
-//            System.out.println(countOfHebivorouses + " Hebivorouses stay alive");
-//            return false;
-//        } else if (countOfPredators == 0 && countOfHebivorouses == 0 && countOfPlants > 0) {
-//            System.out.println(countOfPlants + " Plants stay alive");
-//            return false;
-//
-//
-//        } else if (countOfPredators > 0 && countOfHebivorouses == 0 && countOfPlants > 0) {
-//            System.out.println(countOfPredators + " Predators & plants stay alive");
-//            return false;
-//
-//        } else
-//            return true;
-//    }
-
-    public void printStatistic() {
+    // Determine if the simulation should end based on the organisms remaining
+    private boolean endOfSimulation() {
         int countOfPredators = 0;
         int countOfHebivorouses = 0;
         int countOfPlants = 0;
 
-//        int countOfLocalPredators = 0;
-//        int countOfLocalHebivorouses = 0;
-//        int countOfLocalPlants = 0;
-
-
         for (int i = 0; i < rows; i++) {
-
-
-            for (int j = 0; j < colls; j++) {
-//                System.out.println("Count of local predators : " + countOfLocalPredators + ".\n" + "Count of local hebivorouses : " + countOfLocalHebivorouses + ".\n" + "Count of local plants : " + countOfLocalPlants + ".");
-//                System.out.println();
-////                countOfLocalPredators = 0;
-////                countOfLocalHebivorouses = 0;
-////                countOfLocalPlants = 0;
+            for (int j = 0; j < cols; j++) {
 
                 for (Organizm currentOrganizm : locations[i][j].getOrganizms()) {
                     if (currentOrganizm instanceof Predator) {
                         countOfPredators++;
-                        //                          countOfLocalPredators++;
                     } else if (currentOrganizm instanceof Herbivorous) {
                         countOfHebivorouses++;
-                        //                         countOfLocalHebivorouses++;
                     } else if (currentOrganizm instanceof Plant) {
                         countOfPlants++;
-                        //                            countOfLocalPlants++;
                     }
                 }
-
             }
+        }
+        if (countOfPredators == 0 && countOfHebivorouses == 0 && countOfPlants == 0) {
+            System.out.println("All died");
+            return false;
+        } else if (countOfPredators > 0 && countOfHebivorouses == 0 && countOfPlants == 0) {
+            System.out.println(countOfPredators + " Predators stay alive");
+            return false;
+        } else if (countOfPredators == 0 && countOfHebivorouses > 0 && countOfPlants == 0) {
+            System.out.println(countOfHebivorouses + " Hebivorouses stay alive");
+            return false;
+        } else if (countOfPredators == 0 && countOfHebivorouses == 0 && countOfPlants > 0) {
+            System.out.println(countOfPlants + " Plants stay alive");
+            return false;
 
 
+        } else if (countOfPredators > 0 && countOfHebivorouses == 0 && countOfPlants > 0) {
+            System.out.println(countOfPredators + " Predators & plants stay alive");
+            return false;
+
+        } else return true;
+    }
+
+    // Print the statistics (number of each type of organism) to the console
+    public void printStatistic() throws InterruptedException {
+        int countOfPredators = 0;
+        int countOfHebivorouses = 0;
+        int countOfPlants = 0;
+
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+
+                for (Organizm currentOrganizm : locations[i][j].getOrganizms()) {
+                    if (currentOrganizm instanceof Predator) {
+                        countOfPredators++;
+                        ;
+                    } else if (currentOrganizm instanceof Herbivorous) {
+                        countOfHebivorouses++;
+
+                    } else if (currentOrganizm instanceof Plant) {
+                        countOfPlants++;
+
+                    }
+                }
+            }
         }
         System.out.println("Count of predators : " + countOfPredators + ".\n" + "Count of hebivorouses : " + countOfHebivorouses + ".\n" + "Count of plants : " + countOfPlants + ".");
         System.out.println();
         countOfPredators = 0;
         countOfHebivorouses = 0;
         countOfPlants = 0;
+        Thread.sleep(1000);
     }
-
+    // Getter and Setter methods
     public int getRows() {
         return rows;
     }
 
-    public int getColls() {
-        return colls;
+    public int getCols() {
+        return cols;
     }
-
+    // Get the location at a specific row and column
+    public Location getLocation(int y, int x) {
+        return locations[y][x];
+    }
 
 }
 

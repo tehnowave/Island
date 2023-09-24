@@ -7,9 +7,10 @@ public interface Organizm {
 
     boolean eat(Organizm organizm);
 
-    void die();
+
 
     void move();
 
     boolean isNotMoved();
+    boolean isCanBreed();
 }

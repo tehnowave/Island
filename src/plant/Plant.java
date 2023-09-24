@@ -43,11 +43,9 @@ public class Plant implements Organizm {
     }
 
     @Override
-    public void die() {
-
-
+    public boolean isCanBreed() {
+        return canBreed;
     }
-
 
     @Override
     public void move() {
