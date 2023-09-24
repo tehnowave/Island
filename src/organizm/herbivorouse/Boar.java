@@ -1,6 +1,6 @@
-package animals.herbivorouse;
+package organizm.herbivorouse;
 
-import animals.Animal;
+import organizm.Animal;
 
 public class Boar extends Herbivorous {
     public Boar(int y, int x) {

@@ -1,7 +1,7 @@
-package animals.predator;
+package organizm.predator;
 
-import animals.Animal;
-import animals.herbivorouse.*;
+import organizm.Animal;
+import organizm.herbivorouse.*;
 
 
 import java.util.HashMap;

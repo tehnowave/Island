@@ -1,10 +1,10 @@
 package core;
 
-import animals.Animal;
-import animals.Organizm;
-import animals.herbivorouse.*;
-import animals.predator.*;
-import plant.Plant;
+import organizm.Animal;
+import organizm.Organizm;
+import organizm.herbivorouse.*;
+import organizm.predator.*;
+import organizm.Plant;
 
 
 public class Field {

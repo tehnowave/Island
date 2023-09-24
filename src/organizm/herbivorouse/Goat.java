@@ -1,7 +1,7 @@
-package animals.herbivorouse;
+package organizm.herbivorouse;
 
-import animals.Animal;
-import animals.Organizm;
+import organizm.Animal;
+import organizm.Organizm;
 
 
 public class Goat extends Herbivorous {

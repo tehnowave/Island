@@ -1,4 +1,4 @@
-package animals;
+package organizm;
 
 
 public interface Organizm {

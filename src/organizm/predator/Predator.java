@@ -1,8 +1,8 @@
-package animals.predator;
+package organizm.predator;
 
-import animals.Animal;
-import animals.Organizm;
-import animals.herbivorouse.Herbivorous;
+import organizm.Animal;
+import organizm.Organizm;
+import organizm.herbivorouse.Herbivorous;
 
 import java.util.HashMap;
 import java.util.concurrent.ThreadLocalRandom;

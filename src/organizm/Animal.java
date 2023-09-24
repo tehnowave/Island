@@ -1,4 +1,4 @@
-package animals;
+package organizm;
 
 import core.Directions;
 import core.RandomUtil;

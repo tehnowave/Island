@@ -1,11 +1,10 @@
 package core;
 
-import animals.Animal;
-import animals.Organizm;
-import plant.Plant;
+import organizm.Animal;
+import organizm.Organizm;
+import organizm.Plant;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 public class Location {

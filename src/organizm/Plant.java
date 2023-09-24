@@ -1,6 +1,4 @@
-package plant;
-
-import animals.Organizm;
+package organizm;
 
 public class Plant implements Organizm {
 
